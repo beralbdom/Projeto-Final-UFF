@@ -1,0 +1,77 @@
+% abnTeX2: Modelo de Trabalho Academico  em conformidade com ABNT NBR 14724:2011
+% http://www.abntex.net.br/
+
+% Customização Dept. Engenharia Elétrica UFF
+% Autor: Bernardo Albuquerque (Adaptado da Prof. Malú Grave e Jonas Alessi)
+% Versão: 15 de Janeiro de 2025.
+
+% Edição: VSCode (LaTeX Workshop + LaTeX Utilities)
+% Programas necessários: MiKTeX, Strawberry Perl, Inkscape
+% Codificação: UTF-8
+% LaTeX: abnTeX2
+% ----------------------------------------------------------------------------------------------------------------------
+\usepackage{cmap}                																						% Mapear caracteres especiais no PDF
+\usepackage{lmodern}             																						% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}         																						% Selecao de codigos de fonte
+\usepackage[utf8]{inputenc}      																						% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}            																						% Usado pela Ficha catalográfica
+\usepackage{indentfirst}         																						% Indenta o primeiro parágrafo de cada seção
+\usepackage{color}               																						% Controle das cores
+\usepackage{graphicx}            																						% Inclusão de gráficos
+\usepackage{amsfonts}            																						% Símbolos
+\usepackage[none]{hyphenat}      																						% Sem separação de sílabas
+\usepackage{pdfpages}            																						% Acrescentar pdf ficha bibliográfica
+\usepackage{titlesec}            																						% Modificar títulos
+\usepackage{algorithm}           																						% Pacote para algoritmos
+\usepackage{algpseudocode}       																						% Pacote para algoritmos
+\usepackage{svg}                 																						% Pacote para incluir imagens svg
+\usepackage{lipsum}              																						% para geração de dummy text
+\usepackage[brazilian, hyperpageref]{backref}  																			% Paginas com as citações na bibliografia
+\usepackage{enumitem}
+	\setitemize[0]{itemindent=0.4cm, itemsep=0pt}
+	\setenumerate[0]{itemindent=0.5cm, itemsep=0pt}
+\usepackage[alf,
+abnt-emphasize=bf,		 		 																						% destaca o título da obra em negrito
+abnt-url-package=none,			 																						% Utiliza o pacote url
+abnt-repeated-title-omit=yes,	 																						% Retira a string "Repetição de título" nas referências
+abnt-full-initials=yes,          																						% yes nome por extenso, no apenas iniciais
+abnt-etal-list=3                 																						% abreviar com mais de 3 autores
+]{abntex2/abntex2cite}           																						% Citações padrão ABNT
+
+% \usepackage{draftwatermark}
+% \SetWatermarkText{PRÉVIA}
+% \SetWatermarkScale{1}
+% \SetWatermarkColor[gray]{0.9}
+
+% Configurações de aparência do PDF final
+% ----------------------------------------------------------------------------------------------------------------------
+\definecolor{blue}{RGB}{41,5,195}    																					% alterando o aspecto da cor azul
+\titleformat{\chapter}[display]																							% Formatação do título do capítulo
+    {\normalfont\huge\bfseries}
+    {Capítulo \thechapter}{20pt}
+    {}
+    {}
+\titlespacing*{\chapter}{0pt}{-20pt}{40pt}																				% Espaçamento entre o título do capítulo e o texto
+
+\setlength{\parindent}{1.25cm}																							% Espaçamento entre o título do capítulo e o texto
+\linespread{1.5}																										% Espaçamento entre linhas
+
+\setlength{\afterchapskip}{\baselineskip}																				% Espaçamento entre o título do capítulo e o texto
+% \setlength{\afterchapskip}{\lineskip}
+\setlength{\parskip}{0cm}																								% Espaçamento entre parágrafos
+
+\hangcaption																											% Alinhamento de legendas
+\captionstyle[\raggedright]{}																							% Alinhamento de legendas
+
+\renewcommand{\backref}{}																								% Não gera texto de referência nas citações
+\renewcommand*{\backrefalt}[4]{}																						% Define os textos da citação
+\renewcommand{\listalgorithmname}{Lista de Algoritmos}																	% Nome da lista de algoritmos
+\renewcommand{\listtablename}{Lista de Tabelas}																			% Nome da lista de tabelas
+
+\captionnamefont{\ABNTEXfontereduzida}																					% Fonte das legendas
+\captiontitlefont{\ABNTEXfontereduzida}																					% Fonte das legendas
+\setlength\cftbeforechapterskip{0pt}																					% Espaçamento entre capítulos
+
+% Compila o índice
+% ----------------------------------------------------------------------------------------------------------------------
+\makeindex

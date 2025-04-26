@@ -1,0 +1,118 @@
+% abnTeX2: Modelo de Trabalho Academico  em conformidade com ABNT NBR 14724:2011
+% http://www.abntex.net.br/
+
+% Customização Dept. Engenharia Elétrica UFF
+% Autor: Bernardo Albuquerque (Adaptado da Prof. Malú Grave e Jonas Alessi)
+% Versão: 15 de Janeiro de 2025.
+
+% Edição: VSCode (LaTeX Workshop + LaTeX Utilities)
+% Programas necessários: MiKTeX, Strawberry Perl, Inkscape
+% Codificação: UTF-8
+% LaTeX: abnTeX2
+% ----------------------------------------------------------------------------------------------------------------------
+
+\documentclass[
+  12pt,				                                                                                                          % Tamanho da fonte	
+  oneside,                                                                                                              % Não imprimir em verso e anverso, oposto do twoside 
+  a4paper,			                                                                                                        % Tamanho do papel. 
+  chapter = Title,		                                                                                                  % Títulos de capítulos convertidos em letras maiúsculas
+  section = Title,		                                                                                                  % Títulos de seções convertidos em letras maiúsculas
+  subsection = Title,	                                                                                                  % Títulos de subseções convertidos em letras maiúsculas
+  english,			                                                                                                        % Idioma adicional para hifenização
+  brazil,			                                                                                                          % O último idioma é o principal do documento
+  sumario = tradicional
+  ]{abntex2-uff}
+
+\include{config_inicial}                                                                                                % Pacotes fundamentais e configurações do documento
+\include{pretextuais/capa}                                                                                              % Capa do documento deve ser antes do início do documento
+
+\begin{document}
+\frenchspacing                                                                                                          % Retira espaço extra obsoleto entre as frases.
+
+% Elementos pré-textuais
+% ----------------------------------------------------------------------------------------------------------------------
+% Capa
+{\Large \imprimircapa}
+
+% Folha de rosto
+\imprimirfolhaderosto
+
+% Ficha catalográfica
+\includepdf[pages=-]{pretextuais/ficha.pdf}                                                                             % https://bibliotecas.uff.br/bcg/fichacatalografica/
+
+% Folha de aprovação
+\include{pretextuais/folhadeaprovacao}
+
+% Dedicatória
+\include{pretextuais/dedicatoria}
+
+% Agradecimentos
+\include{pretextuais/agradecimentos}
+
+% Epígrafe
+%\include{pretextuais/epigrafe}
+
+% Resumos
+\include{pretextuais/resumos}
+
+% Lista de ilustrações, tabelas e algoritmos
+\renewcommand{\listfigurename}{}                                                                                        % Retira o nome da lista
+\pretextualchapter{Lista de Figuras}                                                                                    % Capítulo sem numeração
+\listoffigures*                                                                                                         % * indica que a lista não vai para o sumário
+\cleardoublepage
+
+\renewcommand{\listtablename}{}
+\pretextualchapter{Lista de Tabelas}
+\listoftables*
+\cleardoublepage
+
+% Lista de abreviaturas e siglas
+\begin{siglas}
+  \item[ONS] Operador Nacional do Sistema Elétrico
+  \item[EPE] Empresa de Pesquisa Energética
+  \item[SIN] Sistema Interligado Nacional
+  \item[] 
+\end{siglas}
+
+% Sumário
+\renewcommand{\contentsname}{}	% Retira o nome da lista
+\pretextualchapter{Sumário}
+\tableofcontents*
+\cleardoublepage
+
+% Elementos textuais
+% ----------------------------------------------------------------------------------------------------------------------
+\textual
+
+% Introdução
+\include{conteudo/introducao}
+
+% Fundamentação Teórica
+% \include{conteudo/fundamentacao}
+
+% Desenvolvimento
+\include{conteudo/desenvolvimento}
+
+% Resultados
+\include{conteudo/resultados}
+
+% Conclusão
+\include{conteudo/conclusao}
+
+% Elementos pós-textuais
+% ----------------------------------------------------------------------------------------------------------------------
+\postextual
+
+% Referências
+\bibliographystyle{abntex2-alf}
+\bibliography{referencias}
+
+% Apêndices
+\include{postextuais/apendice}
+
+% Anexos
+\include{postextuais/anexo}
+
+% Índice remissivo
+\printindex
+\end{document}

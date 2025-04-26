@@ -1,0 +1,236 @@
+\chapter{Metodologia}
+\section{Abordagem computacional}
+
+O projeto tem como objetivo analisar o impacto de variáveis climatológicas, como anomalias e outros índices, na geração
+de energia elétrica no Brasil. Para isso, foram adotadas técnicas computacionais para processamento de séries temporais,
+correlação de variáveis, \textit{feature selection}, análise de componentes principais e implementação de modelos de 
+regressão e aprendizado de máquina. 
+
+As etapas de processamento intensivo foram otimizadas para execução em paralelo,
+de modo a melhor utilizar os recursos computacionais. Todo o processamento foi realizado em um computador com 
+processador AMD Ryzen 5900X e 32 GB de memória RAM, utilizando todas as 24 \textit{threads} disponíveis.
+
+\begin{table}[htb]
+  \centering
+   \IBGEtab{
+    \caption{Bibliotecas utilizadas no projeto}
+    \label{tab:bibliotecas}
+    }{
+    \begin{tabular}{llll}
+  		  \hline
+    	  \textbf{Biblioteca} & \textbf{Descrição} & \textbf{Versão} \\ \hline
+        numpy & Cálculos numéricos e manipulação de arrays & 1.26.4 \\
+        pandas & Manipulação e análise de dados (DataFrames) & 2.2.3 \\
+        requests & Requisições HTTP & 2.32.3 \\
+        urllib3 & Gerenciamento de conexões HTTP & 2.2.3 \\
+        alive\_progress & Barra de progresso para loops & 3.2.0 \\
+        netCDF4 & Leitura de arquivos NetCDF & 1.7.2 \\
+        cdsapi & API para download de dados do ECMWF & 0.7.5 \\
+        geopandas & Manipulação de dados geoespaciais & 1.0.1 \\
+        matplotlib & Visualização de dados & 3.9.2 \\
+        scikit-learn & Ferramentas de aprendizado de máquina & 1.5.2 \\
+        scipy & Ferramentas e algoritmos matemáticos & 1.14.1 \\
+        \hline
+    \end{tabular}
+    }{
+      \fonte{o autor.}}
+\end{table}
+
+Além disso, toda a base de código foi desenvolvida em Python versão 3.12 e está disponível em um repositório público no
+GitHub. O projeto foi organizado em módulos, cada um responsável por uma etapa do processo, desde a obtenção dos dados 
+até a implementação dos modelos de aprendizado de máquina. A tabela \ref{tab:bibliotecas} mostra as bibliotecas 
+utilizadas no projeto.
+
+\section{Obtenção e pré-processamento dos dados}
+\subsection{Séries históricas do ONS}
+
+A primeira etapa do projeto consiste na consolidação das séries históricas de geração, carga e variáveis hidrológicas,
+que são disponibilizadas publicamente no portal Dados Abertos do ONS, a partir do ano 2000. As séries referentes 
+às variáveis hidrológicas são disponibilizadas em base diária, e os dados de geração e carga são disponibilizados em 
+base horária. Sendo assim, a fim de obter uma amostragem representativa e suficiente para aplicação dos modelos 
+computacionais, optou-se por utilizar a base temporal diária. 
+
+Os dados de geração são disponibilizados em Mega Watt médio (MWmed) por fonte de energia, subsistema, estado, 
+modalidade de operação, entre outras variáveis. Os dados de carga também são disponibilizados em MWmed e contêm 
+informações sobre a carga em cada subsistema do SIN.
+
+Para as séries de carga, os dados de 2000 a 2021 são agrupados pelos respectivos anos, e a partir de 2022,
+as informações estão agrupadas em arquivos por mês e ano. Para as séries de geração, os dados são disponibilizados por
+ano. Como o ONS não disponibiliza Aplication Programming Interface (API) para a obtenção dos dados diretamente, foi 
+necessário uma outra abordagem, a fim de evitar o download manual dos dados. 
+
+Após identificar o padrão de nomenclatura utilizado pelo ONS para os arquivos, foram desenvolvidas as funções 
+\textit{GetGeracao}, \textit{GetCarga} e \textit{GetVazao} para obtenção dos dados de geração, carga e hidrológicos,
+respectivamente. Os arquivos foram baixados por meio de requisições HTTP, utilizando a biblioteca \textit{requests} e
+a biblioteca \textit{urllib3} para gerenciar as conexões. Além disso, as funções realizam o download dos arquivos em
+paralelo, utilizando todas as threads disponíveis do sistema. Ao todo, cerca de 10 GB de dados em arquivos Comma 
+Separated Values (CSV) foram consolidados.
+
+
+\begin{algorithm}
+  \caption{Pseudocódigo para download dos dados de geração (GetGeracao)}
+  \label{alg:get_geracao_pseudo}
+  \begin{algorithmic}[1] % Use [1] for line numbering
+  
+\Function{GetGeracao}{lista\_anos, url\_base}
+    \State Iniciar barra de progresso para \textit{lista\_anos}
+    \Comment{As chamadas a DownloadAno dentro do loop são executadas em paralelo}
+    \For{cada \textit{ano} em \textit{lista\_anos}}
+        \State \Call{DownloadAno}{ano, url\_base}
+        \State Atualizar barra de progresso \Comment{Após cada ano concluir}
+    \EndFor
+    \State Finalizar barra de progresso
+\EndFunction
+\Statex
+
+\Function{DownloadAno}{ano, url\_base}
+    \If{ano < 2022} \Comment{Lógica para anos antes de 2022}
+        \State url $\gets$ \Call{ConstruirURLAnual}{url\_base, ano}
+        \State sucesso $\gets$ \Call{BaixarESalvarArquivo}{url, ano}
+        \If{sucesso}
+            \State \Call{Imprimir}{"Sucesso ao baixar dados de", ano}
+        \Else
+            \State \Call{Imprimir}{"Falha ao baixar dados de", ano}
+        \EndIf
+        \State \Return sucesso
+    \Else \Comment{Lógica para 2022 em diante}
+        \State sucesso\_geral\_ano $\gets$ True
+        \For{mes de 1 a 12}
+            \State url $\gets$ \Call{ConstruirURLMensal}{url\_base, ano, mes}
+            \State sucesso\_mes $\gets$ \Call{BaixarESalvarArquivo}{url, ano, mes}
+            \If{sucesso\_mes}
+                \State \Call{Imprimir}{"Sucesso ao baixar dados de", mes, "/", ano}
+            \Else
+                \State \Call{Imprimir}{"Falha ao baixar dados de", mes, "/", ano}
+                \State sucesso\_geral\_ano $\gets$ False \Comment{Marca o ano como falho se um mês falhar}
+            \EndIf
+        \EndFor
+        \State \Return sucesso\_geral\_ano
+    \EndIf
+\EndFunction
+\Statex
+
+\Function{BaixarESalvarArquivo}{url, ...} \Comment{Função genérica para baixar e salvar}
+    \State Tentar baixar conteúdo da \textit{url}
+    \If{Download bem-sucedido}
+        \State Salvar conteúdo em arquivo local apropriado
+        \State \Return True
+    \Else
+        \State \Return False
+    \EndIf
+\EndFunction
+  
+  \end{algorithmic}
+  \end{algorithm}
+
+
+Considerando o período de 2000 a 2024, foram consolidados ao todo 9132 amostras diárias para cada variável. Caso fosse
+considerada a amostragem mensal, o número de amostras seria de apenas 300, o que poderia não ser suficiente para
+a aplicação dos modelos. Ainda assim, análises em base mensal poderão ser realizadas posteriormente, considerando a
+possibilidade de transofrmação dos dados para essa escala temporal.
+
+Toda a manipulação dos dados foi realizada utilizando a biblioteca \textit{pandas}, de modo a facilitar a seleção das
+variáveis de interesse
+
+\begin{table}[htb]
+  \centering
+   \IBGEtab{
+    \caption{Parâmetros dos dados de geração}
+    \label{tab:geracao}
+    }{
+      \begin{tabular}{llll}
+          \hline
+          \textbf{Parâmetro} & \textbf{Descrição} & \textbf{Tipo} \\ \hline
+          din\_instante & Instante de aferição & Datetime\\
+          nom\_subsistema & Subsistema da usina & String\\
+          id\_estado & Estado onde a usina está localizada & String\\ 
+          nom\_tipousina & Tipo de usina & String\\
+          nom\_tipocombustivel & Tipo de combustível & String\\
+          nom\_usina & Nome da usina & String\\
+          val\_geracao & Geração de energia (MWmed) & Float\\ \hline
+      \end{tabular}
+    } {
+      \fonte{\citeonline{pen2024}}
+      \nota{Variáveis não utilizadas foram omitidas.}
+    }
+\end{table}
+
+\begin{table}[htb]
+  \centering
+   \IBGEtab{
+    \caption{Parâmetros dos dados de carga}
+    \label{tab:carga}
+    }{
+    \begin{tabular}{llll}
+  		  \hline
+    	  \textbf{Parâmetro} & \textbf{Descrição} & \textbf{Tipo} \\ \hline
+        din\_instante & Instante de aferição & Datetime\\
+        nom\_subsistema & Subsistema da usina & String\\
+        val\_cargaenergiahomwmed & Carga de energia (MWmed) & Float\\ \hline
+    \end{tabular}
+    }{
+      \fonte{\citeonline{pen2024}}}
+\end{table}
+
+Verifica-se, a partir da tabela \ref{tab:geracao}, que os dados de geração contém informações que permitem uma análise 
+detalhada da operação do SIN em diferentes níveis de granulidade. Dessa maneira, possíveis impactos em diferentes 
+escalas geográficas e temporais poderão ser avaliados. Por outro lado, a tabela \ref{tab:carga} mostra que os dados de
+carga não possuem a mesma granulidade que os dados de geração, limitando a análise a nível de subsistema, conforme a
+figura \ref{fig:subsistemas_brasil}.
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Subsistemas do SIN}
+			 \label{fig:subsistemas_brasil}}
+	{\includesvg[scale=1]{figuras/subsistemas_brasil}}
+	{\fonte{o autor.}}
+\end{figure}
+
+\subsection{Séries históricas de variáveis climatológicas}
+A fim de maximizar o potencial de análise do projeto, é essencial considerar um grande número de dados climatológicos, 
+como anomalis de temperatura, precipitação, pressão, radiação solar, entre outros. Para isso, foram utilizados dados 
+disponibilizados pelo ECMWF, NOAA e também do departamento de ciências atmosféricas da UNIFEI.
+
+Os dados do ECMWF foram obtidos através da API do CDS (Climate Data Store), que permite o download de dados 
+meteorológicos de alta resolução, sendo possível especificar a escala temporal e a área de interesse, especificando as 
+coordenadas geográficas. Os dados do NOAA e UNIFEI foram obtidos através de requisições HTTP.
+
+É importante ressaltar que, embora a maioria dos dados climatológicos seja disponibilizada em base mensal, alguns
+possuem escala temporal diária, como alguns dados do ECMWF. Considerando que os dados de energia são disponibilizados em
+base horária, diferentes análises poderão ser realizadas, considerando as escalas temporais diária e mensal. Para isso,
+durante a etapa de pré-processamento dos dados, será realizada a consolidação dos dados de geração e carga de modo que
+estejam na mesma escala temporal dos dados climatológicos.
+
+Além disso, nas próximas etapas do projeto, será realizado a seleção das variáveis climatológicas mais relevantes para
+a análise, considerando a correlação com a geração de energia. Para isso, serão utilizadas técnicas de \textit{feature
+selection} e redução de dimensionalidade, como a análise de componentes principais. A tabela \ref{tab:variaveis_clima}
+mostra as variáveis climatológicas utilizadas no projeto.
+
+\subsection{Pré-processamento dos dados}
+\lipsum[1]
+
+\section{Análise exploratória dos dados}
+\lipsum[1]
+
+\section{Implementação dos modelos de regressão}
+\lipsum[1]
+
+\subsection{Feature selection}
+\lipsum[1]
+
+\subsection{Análise de componentes principais}
+\lipsum[1]
+
+\subsection{Avaliação dos modelos de regressão}
+\lipsum[1]
+
+\section{Implementação dos modelos de aprendizado de máquina}
+\lipsum[1]
+
+\subsection{Feature selection}
+\lipsum[1]
+
+\subsection{Análise de componentes principais}
+\lipsum[1]
+
+\subsection{Avaliação dos modelos de aprendizado de máquina}
+\lipsum[1]

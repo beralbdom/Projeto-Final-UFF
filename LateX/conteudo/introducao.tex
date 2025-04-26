@@ -1,0 +1,132 @@
+% Introdução e Trabalhos Relacionados (capítulos 1 e 2)
+% ----------------------------------------------------------------------------------------------------------------------
+\chapter{Introdução}
+\sloppy																													% Para justificar o texto
+
+\section{Contexto}
+Historicamente, a matriz elétrica brasileira é considerada uma das mais limpas do mundo, com destaque para a fonte
+hidráulica, que é responsável pela maior parte da geração de energia elétrica no país. Nos últimos anos, outras fontes
+de geração vêm sendo incorporadas ao sistema, das quais destacam-se a eólica e solar fotovoltaica, conforme observado na
+Figura \ref{fig:geracao_anual_por_fonte}, elaborada a partir de dados brutos de geração obtidos do Operador Nacional do
+Sistema Elétrico (ONS). 
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Geração anual por fonte}
+			 \label{fig:geracao_anual_por_fonte}}
+	{\includesvg[scale=1]{figuras/geracao_anual_por_fonte}}
+	{\fonte{o autor.}}
+\end{figure}
+
+Essa expansão se dá em função do maior número de empreendimentos participantes nos Leilões de 
+Energia Elétrica do Ambiente de Contratação Regulada (ACR) realizados pela Empresa de Pesquisa Energética (EPE), bem 
+como da redução dos custos de implantação e operação. Nota-se, em especial, um crescimento significativo da geração 
+eólica, que passou de 1\% em 2014 para 12\% em 2023, ano em que a fonte eólica foi responsável por 48\% da expansão da 
+capacidade isntalada do SIN, segundo o Balanço Energético Nacional (BEN) de 2024. \cite{EPE2024}
+
+Embora essa expansão seja positiva, poupando recursos hídricos, contribuindo para a diversificação da matriz elétrica e
+reduzindo o acionamento de usinas térmicas, essas fontes possuem características intrínsecas que as tornam intermitentes,
+como a incidência solar e a velocidade do vento. Essas variáveis possuem sazonalidades de curto e longo prazo, a 
+depender da hora do dia e estação do ano, por exemplo.
+
+Além disso, ao analisar a curva de carga do SIN, observa-se que, embora o seu pico ocorra no início da 
+tarde, momento no qual a geração solar fotovoltaica apresenta significativa contribuição, o período noturno também 
+apresenta carga considerável, conforme a Figura \ref{fig:carga_max_dia}, que mostra a curva de carga do SIN para o 
+dia 15 de março de 2024, dia em que registrou-se um recorde de demanda máxima de 102.478 MW, segundo o ONS, e como pode 
+ser observado na Figura \ref{fig:carga_anual}.
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Curva de carga diária do SIN em base horária}
+			 \label{fig:carga_max_dia}}
+	{\includesvg[scale=1]{figuras/carga_max_dia_2024-03-15}}
+	{\fonte{o autor.}}
+\end{figure}
+
+\section{Motivação}
+Em um contexto no qual a implementação de sistemas de armazenamento de energia elétrica ainda é incipiente,
+a matriz segue bastante dependente da fonte hidráulica e, de maneira complementar, das térmicas. A dependência da fonte
+hidráulica, por sua vez, torna o sistema elétrico vulnerável a eventos climáticos extremos ocasionados pelas mudanças
+climáticas. Por exemplo, em 2021, verificou-se um acionamento recorde de usinas térmicas e uma geração hidráulica 
+percentual mínima. Isso se deve em razão da forte crise hídrica enfrentada pelo Brasil em 2021, a pior dos últimos 91 
+anos. \cite{Soares2023}
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Curva de carga acumulada do SIN em base mensal}
+			 \label{fig:carga_anual}}
+	{\includesvg[scale=1]{figuras/carga_anual}}
+	{\fonte{o autor.}}
+\end{figure}
+
+Fundamentalmente, em sistemas interligados cuja fonte hidráulica constitui a base da matriz elétrica, é essencial, 
+para um planejamento energético eficiente, otimizar o sistema de modo a considerar a operação de todas as usinas, 
+considerando a incerteza associada às afluências futuras. Dessa forma, estima-se o valor da geração hidrelétrica que 
+poderia substituir a geração térmica a curto ou longo prazo, de modo a reduzir custos de operação do sistema e o risco 
+de utilizar reservatórios de maneira desnecessária, garantindo assim o atendimento à demanda futura, principalmente em 
+casos de escassez hídrica.
+
+Portanto, o estudo da operação do sistema elétrico brasileiro, no contexto de cenários de eventos
+climatológicos extremos é altamente relevante para a segurança energética do país, considerando uma estimativa de 
+crescimento médio anual da carga do SIN de 3,2\%. \cite{pen2024}
+
+Ao analisar a geração hidráulica bruta na Figura \ref{fig:geracao_hidraulica_bruta}, evidenciam-se pontos nos 
+quais a geração é reduzida. Isso ocorre devido à sazonalidade das vazões nas bacias hidrográficas, responsáveis pelo 
+abastecimento dos reservatórios. Considerando a amostragem em base mensal, observa-se que a geração é reduzida nos meses
+de inverno, período caracterizado por menor ocorrência de precipitação e, consequentemente, menor vazão nos rios. Por
+outro lado, nos meses de verão, a geração atinge seus maiores valores.
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Geração hidráulica total em base mensal}
+			 \label{fig:geracao_hidraulica_bruta}}
+	{\includesvg[scale=1]{figuras/geracao_hidraulica_bruta}}
+	{\fonte{o autor.}}
+\end{figure}
+
+Esse comportamento é natural e esperado, uma vez que a geração hidráulica é diretamente influenciada pelas condições
+que afetam a vazão dos rios. No entanto, a ocorrência de eventos climatológicos como o \textit{El-Niño} (EN) e 
+\textit{La-Niña} (LN) pode favorecer condições que impactam diretamente no potencial de geração hidráulica. \cite{de2012influencia}
+
+Fenômenos como o EN e LN são caracterizados por anomalias na temperatura da superfície do mar no Oceano Pacífico
+Equatorial. Essas anomalias são monitoradas por meio de índices como o ONI (Oceanic Niño Index), que é calculado
+pela NOAA e classifica os eventos em três categorias: EN, LN e neutro. A Figura \ref{fig:oni} mostra a classificação
+dos eventos de EN e LN ocorridos entre 2000 e 2024, sendo que a escala de cores indica a intensidade do evento. Ao
+analisar a geração hidráulica bruta no mesmo período, observa-se que a ocorrência de eventos de EN e LN está associada
+a variações na geração.
+
+\begin{figure}[!ht]
+	\IBGEtab{\caption{Índice ONI (Oceanic Niño Index)}
+			 \label{fig:oni}}
+	{\includesvg[scale=1]{figuras/oni}}
+	{\fonte{o autor.}}
+\end{figure}
+
+\section{Objetivo}
+O projeto tem como objetivo analisar o impacto de variáveis climatológicas, como anomalias e outros índices na geração 
+de energia elétrica no Brasil, com foco nas fontes hidráulica e térmica, adotando técnicas computacionais para realizar 
+a análise de correlações entre variáveis climáticas e a geração de energia. Para tanto, serão utilizados séries 
+históricas de geração disponibilizados pelo ONS, bem como séries históricas de anomalias climatológicas, como 
+temperatura da superfície do mar, pressão e precipitação, consolidadas por instituições de pesquisa como o
+ \textit{National Oceanic and Atmospheric Administration} (NOAA) e 
+ \textit{European Centre for Medium-Range WeatherForecasts} (ECMWF).
+
+A partir dessas análises, espera-se identificar padrões de comportamento da geração em cenários de eventos 
+climatológicos extremos, bem como propor medidas de mitigação de riscos e adaptação do sistema elétrico brasileiro a 
+esses eventos. Além disso, o projeto visa estabelecer uma base de conhecimento para futuras pesquisas na área de
+energia e clima.
+
+\section{Estrutura do Trabalho}
+
+O presente trabalho está estruturado em cinco capítulos, sendo:
+\begin{enumerate}
+	\item Introdução, contendo o contexto, motivação, objetivo e estrutura do trabalho;
+	\item Trabalhos Relacionados, que contém uma revisão bibliográfica sobre o tema;
+	\item Metodologia, descrevendo a abordagem computacional adotada para a análise de dados;
+	\item Resultados, que apresenta os resultados obtidos a partir da análise de dados;
+	\item Conclusão e Trabalhos Futuros.
+\end{enumerate}
+
+\chapter{Trabalhos Relacionados}
+Avaliação do Impacto de Secas Severas no Nordeste Brasileiro na Geração de Energia Elétrica Através do Modelo Newave: 
+Projeção das Energias Afluentes e Armazenadas \cite{Vilar2020}
+
+{https://files.abrhidro.org.br/Eventos/Trabalhos/60/PAP023274.pdf}
+
+{https://pantheon.ufrj.br/bitstream/11422/21709/1/887353.pdf}
