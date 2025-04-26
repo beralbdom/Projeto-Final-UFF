@@ -1,3 +1,4 @@
 Arquivos/
-Exportado/ONS/
+Exportado/ONS/*.csv
+Exportado/geracao_fontes_horario.csv
 LateX/jabref-5.15-portable_windows/
