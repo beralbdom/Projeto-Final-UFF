@@ -21,8 +21,8 @@ base_url_ons_vaz = 'https://ons-aws-prod-opendata.s3.amazonaws.com/dataset/dados
 anos = np.arange(2000, 2025, 1)                                                                                         # Anos dos dados a serem baixados
 
 # bd.GetIndices()                                                                                                         # Baixa os dados de teleconexões                (/Exportado/Indices/)
-# bd.GetGeracao(anos = anos, base_url = base_url_ons_ger)                                                                   # Baixa os dados de geração                     (/Exportado/ONS/)
-# bd.GetCarga(anos = anos, base_url = base_url_ons_car)                                                                     # Baixa os dados de carga                       (/Exportado/ONS/)
+# bd.GetGeracao(anos = anos, base_url = base_url_ons_ger)                                                                 # Baixa os dados de geração                     (/Exportado/ONS/)
+# bd.GetCarga(anos = anos, base_url = base_url_ons_car)                                                                   # Baixa os dados de carga                       (/Exportado/ONS/)
 # bd.GetVazao(anos = anos, base_url = base_url_ons_vaz)                                                                   # Baixa os dados de vazões                      (/Exportado/ONS/)
 
 
@@ -35,10 +35,10 @@ bd.ExportarDados('carga', anos = anos, merge = True, export = True)             
 # --------------------------------------> Tratamento de dados e análise inicial <------------------------------------- #
 indices = pd.read_csv('Exportado/teleconexoes.csv').set_index('Data')                                                   # Dados de teleconexões (índices climatológicos)
 geracao = pd.read_csv('Exportado/geracao_fontes_diario.csv').set_index('Data')                                          # Dados de geração em MWMed
-carga = pd.read_csv('Exportado/carga_subsistemas_diario.csv').set_index('Data')                                        # Dados de carga em MWMed
-vazoes = pd.read_csv('Exportado/dados_hidrologicos_diarios.csv').set_index('Data')                                           # Dados de vazões em m3/s
+carga = pd.read_csv('Exportado/carga_subsistemas_diario.csv').set_index('Data')                                         # Dados de carga em MWMed
+vazoes = pd.read_csv('Exportado/dados_hidrologicos_diarios.csv').set_index('Data')                                      # Dados de vazões em m3/s
 dados_cmip = pd.read_csv('Exportado/dados_cmip6_diario.csv').set_index('Data')                                          # Dados do CMIP6 em mm/mês e K
-dados_era5 = pd.read_csv('Exportado/dados_era5_diario.csv').set_index('Data')                                            # Dados do ERA5 em K
+dados_era5 = pd.read_csv('Exportado/dados_era5_diario.csv').set_index('Data')                                           # Dados do ERA5 em K
 
 indices.index = pd.to_datetime(indices.index).to_period('M')
 geracao.index = pd.to_datetime(geracao.index).to_period('D')
@@ -57,7 +57,7 @@ dados_era5['NIN 4'] = dados_era5[['NIN 4_1', 'NIN 4_2']].mean(axis = 1)         
 dados_era5 = dados_era5.drop(columns = ['NIN 4_1', 'NIN 4_2'])
 
 variaveis = pd.concat([indices, dados_era5, dados_cmip, vazoes, carga], axis = 1)
-variaveis = variaveis[variaveis.index.year <= 2022]                                                             # Variáveis de entrada para o modelo de regressão
+variaveis = variaveis[variaveis.index.year <= 2022]                                                                     # Variáveis de entrada para o modelo de regressão
 geracao = geracao[geracao.index.year <= 2022]
 
 print(f'variaveis:\n {variaveis}')
