@@ -24,6 +24,8 @@
 \usepackage{titlesec}            																						% Modificar títulos
 \usepackage{algorithm}           																						% Pacote para algoritmos
 \usepackage{algpseudocode}       																						% Pacote para algoritmos
+\usepackage{algorithmicx}
+\usepackage{float}
 \usepackage{svg}                 																						% Pacote para incluir imagens svg
 \usepackage{lipsum}              																						% para geração de dummy text
 \usepackage[brazilian, hyperpageref]{backref}  																			% Paginas com as citações na bibliografia
@@ -37,6 +39,10 @@ abnt-repeated-title-omit=yes,	 																						% Retira a string "Repetiç
 abnt-full-initials=yes,          																						% yes nome por extenso, no apenas iniciais
 abnt-etal-list=3                 																						% abreviar com mais de 3 autores
 ]{abntex2/abntex2cite}           																						% Citações padrão ABNT
+
+\addto\captionsbrazilian{%
+  \renewcommand{\algorithmname}{Algoritmo}%
+}
 
 % \usepackage{draftwatermark}
 % \SetWatermarkText{PRÉVIA}
@@ -61,8 +67,9 @@ abnt-etal-list=3                 																						% abreviar com mais de 3 
 \setlength{\parskip}{0cm}																								% Espaçamento entre parágrafos
 
 \hangcaption																											% Alinhamento de legendas
-\captionstyle[\raggedright]{}																							% Alinhamento de legendas
+\captionstyle[\raggedright]{}																							% Alinhamento de legendas																						% Alinhamento de legendas
 
+\floatname{algorithm}{Algoritmo}
 \renewcommand{\backref}{}																								% Não gera texto de referência nas citações
 \renewcommand*{\backrefalt}[4]{}																						% Define os textos da citação
 \renewcommand{\listalgorithmname}{Lista de Algoritmos}																	% Nome da lista de algoritmos

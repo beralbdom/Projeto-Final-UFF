@@ -54,8 +54,8 @@ Os dados de geração são disponibilizados em Mega Watt médio (MWmed) por font
 modalidade de operação, entre outras variáveis. Os dados de carga também são disponibilizados em MWmed e contêm 
 informações sobre a carga em cada subsistema do SIN.
 
-Para as séries de carga, os dados de 2000 a 2021 são agrupados pelos respectivos anos, e a partir de 2022,
-as informações estão agrupadas em arquivos por mês e ano. Para as séries de geração, os dados são disponibilizados por
+Para as séries de geração, os dados de 2000 a 2021 são agrupados pelos respectivos anos, e a partir de 2022,
+as informações estão agrupadas em arquivos por mês e ano. Para as séries de carga, os dados são disponibilizados por
 ano. Como o ONS não disponibiliza Aplication Programming Interface (API) para a obtenção dos dados diretamente, foi 
 necessário uma outra abordagem, a fim de evitar o download manual dos dados. 
 
@@ -68,60 +68,56 @@ Separated Values (CSV) foram consolidados.
 
 
 \begin{algorithm}
-  \caption{Pseudocódigo para download dos dados de geração (GetGeracao)}
-  \label{alg:get_geracao_pseudo}
-  \begin{algorithmic}[1] % Use [1] for line numbering
-  
-\Function{GetGeracao}{lista\_anos, url\_base}
-    \State Iniciar barra de progresso para \textit{lista\_anos}
-    \Comment{As chamadas a DownloadAno dentro do loop são executadas em paralelo}
-    \For{cada \textit{ano} em \textit{lista\_anos}}
-        \State \Call{DownloadAno}{ano, url\_base}
-        \State Atualizar barra de progresso \Comment{Após cada ano concluir}
+\caption{Pseudocódigo para download dos dados de geração}
+\label{alg:get_geracao_pseudo}
+\begin{algorithmic}[1]
+  \Function{GetGeracao}{anos, baseUrl}
+    \State Inicializar barra de progresso para \textit{anos}
+    \State Criar um executor de threads
+    \State Submeter tarefas \Call{DownloadAno}{ano} para cada \textit{ano} em \textit{anos} ao executor
+    \For{cada futuro \textit{f} retornado pelo executor}
+      \State Aguardar resultado de \textit{f}
+      \State Atualizar barra de progresso
     \EndFor
-    \State Finalizar barra de progresso
-\EndFunction
-\Statex
-
-\Function{DownloadAno}{ano, url\_base}
-    \If{ano < 2022} \Comment{Lógica para anos antes de 2022}
-        \State url $\gets$ \Call{ConstruirURLAnual}{url\_base, ano}
-        \State sucesso $\gets$ \Call{BaixarESalvarArquivo}{url, ano}
-        \If{sucesso}
-            \State \Call{Imprimir}{"Sucesso ao baixar dados de", ano}
-        \Else
-            \State \Call{Imprimir}{"Falha ao baixar dados de", ano}
-        \EndIf
-        \State \Return sucesso
-    \Else \Comment{Lógica para 2022 em diante}
-        \State sucesso\_geral\_ano $\gets$ True
-        \For{mes de 1 a 12}
-            \State url $\gets$ \Call{ConstruirURLMensal}{url\_base, ano, mes}
-            \State sucesso\_mes $\gets$ \Call{BaixarESalvarArquivo}{url, ano, mes}
-            \If{sucesso\_mes}
-                \State \Call{Imprimir}{"Sucesso ao baixar dados de", mes, "/", ano}
-            \Else
-                \State \Call{Imprimir}{"Falha ao baixar dados de", mes, "/", ano}
-                \State sucesso\_geral\_ano $\gets$ False \Comment{Marca o ano como falho se um mês falhar}
-            \EndIf
+  \EndFunction
+  \State
+  \Function{DownloadAno}{ano}
+    \If{ano < 2022}
+      \State Construir URL: baseUrl + "GERACAO\_USINA-2\_{ano}.csv"
+      \State Fazer requisição HTTP GET para a URL
+      \If{Requisição bem-sucedida (status 200)}
+        \State Abrir arquivo local "GERACAO\_USINA-2\_{ano}.csv" para escrita
+        \For{cada bloco de dados recebido na resposta}
+          \State Escrever bloco no arquivo local
         \EndFor
-        \State \Return sucesso\_geral\_ano
-    \EndIf
-\EndFunction
-\Statex
-
-\Function{BaixarESalvarArquivo}{url, ...} \Comment{Função genérica para baixar e salvar}
-    \State Tentar baixar conteúdo da \textit{url}
-    \If{Download bem-sucedido}
-        \State Salvar conteúdo em arquivo local apropriado
-        \State \Return True
+        \State Fechar arquivo local
+        \State \Return Verdadeiro
+      \Else
+        \State \Return Falso
+      \EndIf
     \Else
-        \State \Return False
+      \State Definir \textit{concluido} como Falso
+      \For{cada \textit{mes} de 1 a 12}
+        \State Formatar \textit{mes} com zero à esquerda se necessário
+        \State Construir URL: baseUrl + "GERACAO\_USINA-2\_{ano}\_{mes}.csv"
+        \State Fazer requisição HTTP GET para a URL
+        \If{Requisição bem-sucedida (status 200)}
+          \State Abrir arquivo local "GERACAO\_USINA-2\_{ano}\_{mes}.csv" para escrita
+          \For{cada bloco de dados recebido na resposta}
+            \State Escrever bloco no arquivo local
+          \EndFor
+          \State Fechar arquivo local
+          \State Definir \textit{concluido} como Verdadeiro
+        \Else
+          \State Definir \textit{concluido} como Falso
+        \EndIf
+      \EndFor
+      \State \Return \textit{concluido}
     \EndIf
-\EndFunction
-  
-  \end{algorithmic}
-  \end{algorithm}
+  \EndFunction
+
+\end{algorithmic}
+\end{algorithm}
 
 
 Considerando o período de 2000 a 2024, foram consolidados ao todo 9132 amostras diárias para cada variável. Caso fosse
